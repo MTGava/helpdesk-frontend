@@ -30,7 +30,11 @@ export class AuthService {
     if (token != null) {
       return !this.jwtService.isTokenExpired(token);
     }
-    
+
     return false;
+  }
+
+  logout() {
+    localStorage.clear();
   }
 }
