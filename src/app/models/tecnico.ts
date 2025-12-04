@@ -5,5 +5,4 @@ export interface Tecnico {
   email: string;
   senha: string;
   perfis: string[];
-  dataCriacao: any;
 }
