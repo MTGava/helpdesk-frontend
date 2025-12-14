@@ -5,6 +5,13 @@
     <mat-label>Filtro</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ex: Chamado 123" #input>
   </mat-form-field>
+
+  <mat-radio-group color="primary">
+    <mat-radio-button>ABERTO</mat-radio-button>
+    <mat-radio-button>ANDAMENTO</mat-radio-button>
+    <mat-radio-button>ENCERRADO</mat-radio-button>
+  </mat-radio-group>
+
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
