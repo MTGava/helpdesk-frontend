@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Chamado } from 'src/app/models/chamado';
+import { ChamadoService } from 'src/app/services/chamado.service';
 
 @Component({
   selector: 'app-chamado-list',
@@ -10,73 +11,60 @@ import { Chamado } from 'src/app/models/chamado';
 })
 export class ChamadoListComponent implements OnInit {
 
-  ELEMENT_DATA: Chamado[] = [
-    {
-      id: 1,
-      titulo: 'Problema ao acessar sistema',
-      nomeCliente: 'João Silva',
-      nomeTecnico: 'Carlos Santos',
-      cliente: 'João Silva',
-      tecnico: 'Carlos Santos',
-      dataAbertura: '2025-12-01',
-      dataFechamento: '2025-12-02',
-      prioridade: 'Alta',
-      status: 'Fechado',
-      observacoes: 'Resetar senha do usuário'
-    },
-    {
-      id: 2,
-      titulo: 'Impressora não conecta à rede',
-      nomeCliente: 'Maria Oliveira',
-      nomeTecnico: 'Ana Costa',
-      cliente: 'Maria Oliveira',
-      tecnico: 'Ana Costa',
-      dataAbertura: '2025-12-03',
-      dataFechamento: null,
-      prioridade: 'Média',
-      status: 'Em Progresso',
-      observacoes: 'Aguardando resposta do cliente'
-    },
-    {
-      id: 3,
-      titulo: 'Software com erro ao abrir',
-      nomeCliente: 'Pedro Santos',
-      nomeTecnico: 'Lucas Ferreira',
-      cliente: 'Pedro Santos',
-      tecnico: 'Lucas Ferreira',
-      dataAbertura: '2025-12-04',
-      dataFechamento: null,
-      prioridade: 'Alta',
-      status: 'Aberto',
-      observacoes: 'Erro ao inicializar aplicação'
-    },
-    {
-      id: 4,
-      titulo: 'Backup não está sendo realizado',
-      nomeCliente: 'Empresa ABC',
-      nomeTecnico: 'Carlos Santos',
-      cliente: 'Empresa ABC',
-      tecnico: 'Carlos Santos',
-      dataAbertura: '2025-11-28',
-      dataFechamento: '2025-12-01',
-      prioridade: 'Crítica',
-      status: 'Fechado',
-      observacoes: 'Configuração corrigida com sucesso'
-    }
-  ];
+  ELEMENT_DATA: Chamado[] = [];
   
   displayedColumns: string[] = ['id', 'titulo', 'nomeCliente', 'nomeTecnico', 'dataAbertura', 'dataFechamento', 'prioridade', 'status', 'acoes'];
   dataSource = new MatTableDataSource<Chamado>(this.ELEMENT_DATA);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor() { }
+  constructor(private service: ChamadoService) { }
 
   ngOnInit(): void {
+    this.findAll();
+  }
+
+  findAll(): void {
+    this.service.findAll().subscribe((resposta) => {
+      this.ELEMENT_DATA = resposta;
+      this.dataSource = new MatTableDataSource<Chamado>(resposta);
+      this.dataSource.paginator = this.paginator;
+    });
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  retornaStatus(status: any): string {
+    if(status == '0') {
+      return 'ABERTO';
+    }
+    else if(status == '1') {
+      return 'ANDAMENTO';
+    }
+    else {
+      return 'ENCERRADO';
+    }
+  }
+
+  retornaPrioridade(prioridade: any): string {
+    if(prioridade == '0') {
+      return 'BAIXA';
+    }
+    else if(prioridade == '1') {
+      return 'MÉDIA';
+    }
+    else {
+      return 'ALTA';
+    }
+  }
+
+  orderByStatus(status: any): void {
+    let lista: Chamado[] = [];
+    lista = this.ELEMENT_DATA.filter(chamado => chamado.status == status);
+    this.dataSource = new MatTableDataSource<Chamado>(lista);
+    this.dataSource.paginator = this.paginator;
   }
 }
